@@ -9,6 +9,7 @@ uint32_t codin_test_multiple_returns(void);
 uint32_t codin_test_defer(void);
 uint32_t codin_test_unions(void);
 uint32_t codin_test_imports(void);
+uint32_t codin_test_generic(void);
 
 int main(void) {
 	assert(codin_test_pair_sum(3, 4) == 7);
@@ -19,5 +20,6 @@ int main(void) {
 	assert(codin_test_defer() == 19);
 	assert(codin_test_unions() == 49);
 	assert(codin_test_imports() == 73);
+	assert(codin_test_generic() == 77);
 	return 0;
 }
