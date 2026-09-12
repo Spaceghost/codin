@@ -9,12 +9,16 @@ path = Path(sys.argv[1])
 src = path.read_text()
 
 
-def replace_once(label: str, old: str, new: str) -> None:
+def replace_count(label: str, old: str, new: str, expected: int) -> None:
     global src
     count = src.count(old)
-    if count != 1:
-        raise SystemExit(f"augment_import: {label}: expected exactly one anchor, found {count}")
-    src = src.replace(old, new, 1)
+    if count != expected:
+        raise SystemExit(f"augment_import: {label}: expected {expected} anchors, found {count}")
+    src = src.replace(old, new)
+
+
+def replace_once(label: str, old: str, new: str) -> None:
+    replace_count(label, old, new, 1)
 
 
 replace_once(
@@ -80,8 +84,8 @@ replace_once(
 \t\t\tconst Type *named_type = sema_lookup_named_type(&c->sema, type_name->contents);''',
 )
 
-replace_once(
-    "prototype declaration name",
+replace_count(
+    "procedure declaration names",
     '''\tif (!emit_procedure_result_type(c, name, procedure)) return false;
 \tfprintf(c->out, " %.*s(", SFMT(name->contents));
 \tif (!emit_parameters(c, procedure)) return false;''',
@@ -90,20 +94,7 @@ replace_once(
 \tif (!emit_declaration_name(c, name)) return false;
 \tfputc('(', c->out);
 \tif (!emit_parameters(c, procedure)) return false;''',
-)
-
-replace_once(
-    "definition declaration name",
-    '''\tif (!emit_procedure_result_type(c, name, procedure)) return false;
-\tfprintf(c->out, " %.*s(", SFMT(name->contents));
-\tif (!emit_parameters(c, procedure)) return false;
-\tfputs(") ", c->out);''',
-    '''\tif (!emit_procedure_result_type(c, name, procedure)) return false;
-\tfputc(' ', c->out);
-\tif (!emit_declaration_name(c, name)) return false;
-\tfputc('(', c->out);
-\tif (!emit_parameters(c, procedure)) return false;
-\tfputs(") ", c->out);''',
+    2,
 )
 
 replace_once(
