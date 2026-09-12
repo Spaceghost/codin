@@ -57,3 +57,10 @@ jobs:
           gcc -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 \
             tests/c99/features/smoke.c "${units[@]}" -o /tmp/codin-features
           /tmp/codin-features
+
+      - name: Reproduce recursive uintptr lowering
+        run: |
+          ./codin dump-ast tests/c99/features/recursive_uintptr
+          ./codin emit-c tests/c99/features/recursive_uintptr -o /tmp/codin-recursive.c
+          gcc -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 -c /tmp/codin-recursive.c -o /tmp/codin-recursive.gcc.o
+          clang -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 -c /tmp/codin-recursive.c -o /tmp/codin-recursive.clang.o
