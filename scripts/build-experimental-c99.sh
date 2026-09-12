@@ -12,7 +12,7 @@ cp -R "$ROOT/src" "$WORK/src"
 patch --batch --forward -d "$WORK" -p1 < \
     "$TOOLS/patches/0001-preserve-positional-compound-values.patch"
 
-for pass in augment_c99 augment_slice_string augment_multi_return augment_defer augment_union augment_import augment_generic; do
+for pass in augment_c99 augment_slice_string augment_multi_return augment_defer augment_union augment_import augment_generic augment_generic_asttruth; do
     python3 "$TOOLS/$pass.py" "$WORK/src/c99.c"
 done
 
