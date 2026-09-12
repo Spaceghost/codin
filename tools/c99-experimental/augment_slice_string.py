@@ -140,5 +140,32 @@ replace_once(
 \t      "typedef struct { const uint8_t *data; uintptr_t len; } codin_string;\\n\\n", out);''',
 )
 
+replace_once(
+    "static string constant initializer",
+    '''\t\t\t\tconst char *type_name = sema_c_type_name(type);
+\t\t\t\tif (!type_name) return unsupported(c, "top-level constant type");
+\t\t\t\tfprintf(c->out, "static const %s %.*s = ", type_name, SFMT(name->contents));
+\t\t\t\tif (!emit_expression(c, value)) return false;
+\t\t\t\tfputs(";\\n", c->out);''',
+    '''\t\t\t\tconst char *type_name = sema_c_type_name(type);
+\t\t\t\tif (!type_name) return unsupported(c, "top-level constant type");
+\t\t\t\tfprintf(c->out, "static const %s %.*s = ", type_name, SFMT(name->contents));
+\t\t\t\tif (type == CTYPE_STRING && value->kind == EXPRESSION_LITERAL) {
+\t\t\t\t\tconst LiteralExpression *literal = RCAST(const LiteralExpression *, value);
+\t\t\t\t\tif (literal->kind != LITERAL_STRING || !literal->value.length ||
+\t\t\t\t\t    literal->value.contents[0] != '\"') {
+\t\t\t\t\t\treturn unsupported(c, "static string literal");
+\t\t\t\t\t}
+\t\t\t\t\tfputs("{ .data = (const uint8_t *)", c->out);
+\t\t\t\t\tfprintf(c->out, "%.*s", SFMT(literal->value));
+\t\t\t\t\tfputs(", .len = sizeof(", c->out);
+\t\t\t\t\tfprintf(c->out, "%.*s", SFMT(literal->value));
+\t\t\t\t\tfputs(") - 1 }", c->out);
+\t\t\t\t} else if (!emit_expression(c, value)) {
+\t\t\t\t\treturn false;
+\t\t\t\t}
+\t\t\t\tfputs(";\\n", c->out);''',
+)
+
 path.write_text(src)
 print("augment_slice_string: []u8 + string value lowering applied")
