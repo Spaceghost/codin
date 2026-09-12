@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euxo pipefail
           units=()
-          for feature in structs arrays enums slices_strings multiple_returns defers unions; do
+          for feature in structs arrays enums slices_strings multiple_returns defers unions imports; do
             out="/tmp/codin-${feature}.c"
             ./codin emit-c "tests/c99/features/${feature}" -o "$out"
             gcc -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 -c "$out" -o "/tmp/codin-${feature}.gcc.o"
