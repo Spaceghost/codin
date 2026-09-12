@@ -14,21 +14,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build Codin
+
+      - name: Build Codin baseline
         run: make
-      - name: Emit C99
+
+      - name: Emit baseline C99
         run: ./codin emit-c tests/c99 -o /tmp/codin-generated.c
+
       - name: GCC strict C99
         run: gcc -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 -c /tmp/codin-generated.c -o /tmp/codin-gcc.o
+
       - name: Clang strict C99
         run: clang -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 -c /tmp/codin-generated.c -o /tmp/codin-clang.o
-      - name: Run generated-code smoke test
+
+      - name: Run baseline generated-code smoke test
         run: |
           gcc -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 tests/c99/smoke.c /tmp/codin-generated.c -o /tmp/codin-smoke
           /tmp/codin-smoke
-      - name: Sanitized compiler run
+
+      - name: Sanitized baseline compiler run
         run: |
           make clean
           make DEBUG=1 ASAN=1 UBSAN=1
           ASAN_OPTIONS=detect_leaks=0 ./codin emit-c tests/c99 -o /tmp/codin-generated-sanitized.c
           cmp /tmp/codin-generated.c /tmp/codin-generated-sanitized.c
+
+      - name: Build expanded C99 backend
+        run: ./scripts/build-experimental-c99.sh
+
+      - name: Emit expanded feature fixtures
+        shell: bash
+        run: |
+          set -euxo pipefail
+          units=()
+          for feature in structs arrays enums slices_strings multiple_returns defers unions; do
+            out="/tmp/codin-${feature}.c"
+            ./codin emit-c "tests/c99/features/${feature}" -o "$out"
+            gcc -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 -c "$out" -o "/tmp/codin-${feature}.gcc.o"
+            clang -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 -c "$out" -o "/tmp/codin-${feature}.clang.o"
+            units+=("$out")
+          done
+          gcc -std=c99 -pedantic-errors -Wall -Wextra -Werror -O3 \
+            tests/c99/features/smoke.c "${units[@]}" -o /tmp/codin-features
+          /tmp/codin-features
