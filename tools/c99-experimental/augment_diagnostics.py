@@ -17,7 +17,16 @@ def replace_once(label: str, old: str, new: str) -> None:
     src = src.replace(old, new, 1)
 
 
-replace_once(
+def replace_all(label: str, old: str, new: str) -> None:
+    global src
+    count = src.count(old)
+    if count == 0:
+        raise SystemExit(f"augment_diagnostics: {label}: expected at least 1 anchor, found 0")
+    src = src.replace(old, new)
+    print(f"augment_diagnostics: {label}: instrumented {count} sites")
+
+
+replace_all(
     "named result error",
     '''\tCType result = sema_procedure_result(procedure);
 \tconst char *result_name = sema_c_type_name(result);
