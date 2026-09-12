@@ -221,12 +221,22 @@ static Bool emit_assignment(C99 *c, const AssignmentStatement *assignment) {
 	return true;
 }
 
+static Bool emit_condition(C99 *c, const Expression *expression) {
+	if (expression && expression->kind == EXPRESSION_BINARY) {
+		return emit_expression(c, expression);
+	}
+	fputc('(', c->out);
+	if (!emit_expression(c, expression)) return false;
+	fputc(')', c->out);
+	return true;
+}
+
 static Bool emit_if(C99 *c, const IfStatement *statement) {
 	if (statement->init) return unsupported(c, "if initializer");
 	indent(c);
-	fputs("if (", c->out);
-	if (!emit_expression(c, statement->cond)) return false;
-	fputs(") ", c->out);
+	fputs("if ", c->out);
+	if (!emit_condition(c, statement->cond)) return false;
+	fputc(' ', c->out);
 	if (!emit_block(c, statement->body)) return false;
 	if (statement->elif) {
 		indent(c);
