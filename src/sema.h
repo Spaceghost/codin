@@ -12,12 +12,15 @@ typedef enum CType {
 	CTYPE_U32,
 	CTYPE_UINTPTR,
 	CTYPE_U8_PTR,
+	CTYPE_SLICE_U8,
+	CTYPE_STRING,
 } CType;
 
 typedef struct SemSymbol {
 	String name;
 	CType type;
 	const ProcedureExpression *procedure;
+	const Type *named_type;
 	Bool exported;
 } SemSymbol;
 
@@ -33,6 +36,7 @@ Bool sema_collect_globals(Sema *sema, const BuildContext *build);
 void sema_begin_procedure(Sema *sema, const ProcedureExpression *procedure);
 Bool sema_add_local(Sema *sema, String name, CType type);
 const SemSymbol *sema_lookup(const Sema *sema, String name);
+const Type *sema_lookup_named_type(const Sema *sema, String name);
 CType sema_type_from_ast(const Type *type);
 CType sema_infer_expression(const Sema *sema, const Expression *expression);
 CType sema_procedure_result(const ProcedureExpression *procedure);
