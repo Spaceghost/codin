@@ -1,20 +1,7 @@
-# codin
+# Codin
 
-An Odin to C compiler written in C.
+An Odin-to-C compiler experiment written in C.
 
-### Building
+The canonical development branch is `master`. The historical `main` branch is retained temporarily for migration and will be removed after the repository default is switched.
 
-To build on Linux
-```
-$ make
-```
-
-> On Linux you have some additional build options provided by the Makefile. Check the documentation at the top of the `Makefile` for them.
-
-To build on Windows
-```
-$ cl.exe unity.c
-```
-
-### License
-Licensed under the MIT license. View copyright information [here](doc/LICENSE.md)
+Codin remains useful as an executable strict-C99 behavior oracle while the newer Bor/Thor work advances. Its C99 feature fixtures are intentionally reusable as differential tests.
