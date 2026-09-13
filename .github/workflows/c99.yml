@@ -2,7 +2,7 @@ name: strict C99 backend
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
   workflow_dispatch:
 
